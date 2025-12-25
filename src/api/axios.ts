@@ -2,7 +2,7 @@ import { useAuthStore } from "@/store/auth.store";
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://192.168.0.198:8080/api",
+  baseURL: "https://foodsy-api-java-spring-boot-production.up.railway.app/api",
   headers: {
     "Content-Type": "application/json",
   },
