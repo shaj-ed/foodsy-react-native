@@ -33,12 +33,17 @@ export const useAuthStore = create<AuthState>((set) => ({
         username,
         password,
       });
-      const data = await response.data;
+      const { accessToken, refreshToken } = response.data;
+
       set({
-        accessToken: data.accessToken,
+        accessToken: accessToken,
       });
 
-      await saveRefreshToken(data.refreshToken);
+      if (!accessToken || !refreshToken) {
+        throw new Error("Invalid login response");
+      }
+
+      await saveRefreshToken(refreshToken);
 
       const currentUser = await getCurrentUser();
 
@@ -48,6 +53,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       });
     } catch (error) {
       console.log(error);
+      throw error;
     }
   },
 }));
