@@ -20,3 +20,11 @@ export type CurrentUserResponse = {
   message: string;
   data: UserType;
 };
+
+export type SignUpPayload = {
+  username: string;
+  email: string;
+  password: string;
+  phoneNumber?: string;
+  address?: string;
+};

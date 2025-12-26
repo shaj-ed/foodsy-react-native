@@ -1,77 +1,114 @@
+import RHFInputText from "@/components/common/form/RHFInputText";
+import RHFTextarea from "@/components/common/form/RHFTextarea";
+import {
+  initSignupFormValues,
+  SignupForm,
+  signUpSchema,
+} from "@/src/validators/auth.schema";
+import { useAuthStore } from "@/store/auth.store";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { ActivityIndicator, Text, TextInput, TouchableOpacity, View } from "react-native";
-
-type TSignUpValues = {
-    email: string,
-    username: string,
-    password: string
-}
+import { useForm } from "react-hook-form";
+import {
+  ActivityIndicator,
+  Alert,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const SignUp = () => {
-    const router = useRouter()
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-    const [signInValues, setSignValues] = useState<TSignUpValues>({email: "", username: "", password: ""})
+  const router = useRouter();
+  const signUp = useAuthStore((e) => e.signUp);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SignupForm>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: initSignupFormValues,
+  });
 
-    return (
-        <View className="px-10">
-            <Text className="text-gray-100 text-3xl text-center font-semibold">Sign Up</Text>
+  const onSignup = async (data: SignupForm) => {
+    try {
+      const { confirmPassword, ...sendvalues } = data;
+      await signUp(sendvalues);
+      Alert.alert("Success", "Registration successfull, yuou can login now");
+      router.push("/(auth)/sign-in");
+    } catch (error) {
+      Alert.alert("Error", "Registration failed try again");
+    }
+  };
 
-            <View className="mt-6">
-                <Text className="text-gray-400 text-xl mb-4">Full name</Text>
-                <TextInput
-                    value={signInValues.username}
-                    onChangeText={(text) => setSignValues((prev) => ({...prev, username: text}))}
-                    className="border border-gray-600 px-4 py-4 rounded focus:border-yellow-300"
-                    placeholder="Enter full name"
-                    placeholderTextColor="#999999"
-                    keyboardType="default"
-                />
-            </View>
+  return (
+    <View className="px-10">
+      <Text className="text-gray-100 text-3xl text-center font-semibold">
+        Sign Up
+      </Text>
 
-            <View className="mt-4">
-                <Text className="text-gray-400 text-xl mb-4">Email address</Text>
-                <TextInput
-                    value={signInValues.email}
-                    onChangeText={(text) => setSignValues((prev) => ({...prev, email: text}))}
-                    className="border border-gray-600 px-4 py-4 rounded focus:border-yellow-300"
-                    placeholder="Enter email address"
-                    placeholderTextColor="#999999"
-                    keyboardType="default"
-                />
-            </View>
+      <RHFInputText<SignupForm>
+        name="username"
+        control={control}
+        label="Username"
+        placeholder="Enter username"
+      />
 
-            <View className="mt-4">
-                <Text className="text-gray-400 text-xl mb-4">Password</Text>
-                <TextInput
-                    value={signInValues.password}
-                    onChangeText={(text) => setSignValues((prev) => ({...prev, password: text}))}
-                    className="border border-gray-600 px-4 py-4 rounded focus:border-yellow-300"
-                    placeholder="*****"
-                    placeholderTextColor="#999999"
-                    secureTextEntry={true}
-                    keyboardType="default"
-                />
-            </View>
+      <RHFInputText<SignupForm>
+        name="email"
+        control={control}
+        label="Email"
+        placeholder="Enter email"
+      />
 
-            <TouchableOpacity className="p-3 bg-yellow-200 rounded mt-6">
-                <View className="flex-row items-center justify-center gap-5">
-                    <Text className="text-xl text-gray-700">Register</Text>
-                    {
-                        isSubmitting &&
-                        <ActivityIndicator size='large' color='#be29ec' />
-                    }
-                </View>
-            </TouchableOpacity>
+      <RHFInputText<SignupForm>
+        name="password"
+        control={control}
+        label="Password"
+        placeholder="Enter password"
+        secureTextEntry
+      />
 
-            <View className="flex-row items-center gap-2 justify-center mt-6">
-                <Text className="text-lg text-gray-300">Already have an account?</Text>
-                <TouchableOpacity onPress={() => router.push('/sign-in')}>
-                    <Text className="text-indigo-400">Sign in</Text>
-                </TouchableOpacity>
-            </View>
+      <RHFInputText<SignupForm>
+        name="confirmPassword"
+        control={control}
+        label="Confirm Password"
+        placeholder="Renter password"
+        secureTextEntry
+      />
+
+      <RHFInputText<SignupForm>
+        name="phoneNumber"
+        control={control}
+        label="Phone number"
+        placeholder="Enter phone number"
+      />
+
+      <RHFTextarea<SignupForm>
+        name="address"
+        control={control}
+        label="Address"
+        placeholder="Enter address"
+        numberOfLine={4}
+      />
+
+      <TouchableOpacity
+        className="p-3 bg-yellow-200 rounded mt-6"
+        onPress={handleSubmit(onSignup)}
+      >
+        <View className="flex-row items-center justify-center gap-5">
+          <Text className="text-xl text-gray-700">Register</Text>
+          {isSubmitting && <ActivityIndicator size="small" color="#be29ec" />}
         </View>
-    )
-}
+      </TouchableOpacity>
+
+      <View className="flex-row items-center gap-2 justify-center mt-6">
+        <Text className="text-lg text-gray-300">Already have an account?</Text>
+        <TouchableOpacity onPress={() => router.push("/sign-in")}>
+          <Text className="text-indigo-400">Sign in</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
 
 export default SignUp;
