@@ -1,30 +1,36 @@
-import { useFonts } from 'expo-font'
-import { SplashScreen, Stack } from 'expo-router'
-import { useEffect } from 'react'
-import './global.css'
+import { queryClient } from "@/src/api/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { useFonts } from "expo-font";
+import { SplashScreen, Stack } from "expo-router";
+import { useEffect } from "react";
+import "./global.css";
 
 export default function RootLayout() {
   const [fontsLoaded, error] = useFonts({
-    'JosefinSans-Bold': require('../assets/fonts/JosefinSans-Bold.ttf'),
-    'JosefinSans-SemiBold': require('../assets/fonts/JosefinSans-SemiBold.ttf'),
-    'JosefinSans-Medium': require('../assets/fonts/JosefinSans-Medium.ttf'),
-    'JosefinSans-Regular': require('../assets/fonts/JosefinSans-Regular.ttf'),
-    'JosefinSans-Light': require('../assets/fonts/JosefinSans-Light.ttf'),
-  })
+    "JosefinSans-Bold": require("../assets/fonts/JosefinSans-Bold.ttf"),
+    "JosefinSans-SemiBold": require("../assets/fonts/JosefinSans-SemiBold.ttf"),
+    "JosefinSans-Medium": require("../assets/fonts/JosefinSans-Medium.ttf"),
+    "JosefinSans-Regular": require("../assets/fonts/JosefinSans-Regular.ttf"),
+    "JosefinSans-Light": require("../assets/fonts/JosefinSans-Light.ttf"),
+  });
 
   useEffect(() => {
     // Prevent splash from hiding before fonts are ready
-    SplashScreen.preventAutoHideAsync()
-  }, [])
+    SplashScreen.preventAutoHideAsync();
+  }, []);
 
   useEffect(() => {
-    if (error) throw error
-    if (fontsLoaded) SplashScreen.hideAsync()
-  }, [fontsLoaded, error])
+    if (error) throw error;
+    if (fontsLoaded) SplashScreen.hideAsync();
+  }, [fontsLoaded, error]);
 
   if (!fontsLoaded) {
-    return null
+    return null;
   }
 
-  return <Stack screenOptions={{ headerShown: false }} />
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Stack screenOptions={{ headerShown: false }} />
+    </QueryClientProvider>
+  );
 }
